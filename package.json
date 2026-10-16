@@ -1,0 +1,13 @@
+{
+  "name": "reclaim-repurpose",
+  "version": "0.1.0",
+  "private": true,
+  "description": "RECLAIM & REPURPOSE – Stage 1 pure validation foundation",
+  "scripts": {
+    "test": "node --test apps-script/tests/validation.test.js",
+    "test:validation": "node --test apps-script/tests/validation.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
