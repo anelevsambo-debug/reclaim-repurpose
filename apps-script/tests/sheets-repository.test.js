@@ -269,6 +269,8 @@ describe('ReclaimSheetsRepository — fail-closed configuration and read isolati
     const lockFailure = harness({ lockFails: true });
     assert.equal(lockFailure.repository.createRegistration(createRequest()).ok, false);
     assert.equal(lockFailure.counts().releaseCount, 0);
+    assert.equal(rows(lockFailure.workbook, 'Registrations').length, 0);
+    assert.equal(rows(lockFailure.workbook, 'RequestDedupe').length, 0);
   });
 
   it('lists only records belonging to the authorised company', () => {
