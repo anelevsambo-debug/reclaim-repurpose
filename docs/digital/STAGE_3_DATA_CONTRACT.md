@@ -111,12 +111,13 @@ Because Google Sheets has no transaction, a crash can leave a `PROCESSING` reser
 
 1. A future transport verifies the incoming provider's authenticity and derives a principal from verified evidence.
 2. A server-side membership resolver queries `CompanyMembers` using the verified provider and subject. Zero matches, multiple matches where one is expected, inactive membership, or invalid company status deny the operation.
-3. The existing `ReclaimAuthorization` policy receives only the trusted principal, authoritative membership, server-selected target company, and action.
-4. The authorized service derives tenant scope from the authorization decision. It must not use a caller-supplied company ID as authority.
-5. The repository validates its inputs, resolves the configured workbook from Script Properties, checks schema metadata and exact headers, and performs the complete duplicate reservation/write sequence under a script lock.
-6. The caller receives a minimal result (registration ID and safe status), never raw rows, spreadsheet errors, secrets, or another tenant's data.
+3. The existing `ReclaimAuthorization` policy receives only the trusted principal, authoritative membership, server-selected target company, and action. Provider and subject must both match.
+4. A trusted registration service must derive `source`, the idempotency key, and consent fields from verified transport metadata and an explicit customer consent event. The repository only validates the supplied shape and requires `consent_status = GRANTED` plus a timestamp; it does **not** prove that a customer actually gave consent. Never pass these fields through directly from arbitrary request JSON.
+5. The authorized service derives tenant scope from the authorization decision. It must not use a caller-supplied company ID as authority.
+6. The repository validates its inputs, resolves the configured workbook from Script Properties, checks schema metadata and exact headers, and performs the complete duplicate reservation/write sequence under a script lock.
+7. The caller receives a minimal result (registration ID and safe status), never raw rows, spreadsheet errors, secrets, or another tenant's data.
 
-Stages 3 and 2 remain separate gates: a data schema and tested repository do not prove identity verification. Until Stage 2's real identity and membership boundary exists, all live registration entry points remain disabled.
+Stages 3 and 2 remain separate gates: a data schema and tested repository do not prove identity verification or consent provenance. Until Stage 2's real identity and membership boundary and the trusted consent flow exist, all live registration entry points remain disabled.
 
 ## 5. Configuration and failure behavior
 
