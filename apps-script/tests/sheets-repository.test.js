@@ -224,7 +224,7 @@ describe('ReclaimSheetsRepository — registration writes', () => {
     h.workbook.sheets.CompanyMembers.rows[1][5] = 'SUSPENDED';
     const result = h.repository.createRegistration(createRequest());
     assert.equal(result.ok, false);
-    assert.equal(result.error.code, 'MEMBERSHIP_INVALID');
+    assert.equal(result.error.code, 'COMPANY_MEMBERSHIP_INACTIVE');
     assert.equal(rows(h.workbook, 'Registrations').length, 0);
   });
 
