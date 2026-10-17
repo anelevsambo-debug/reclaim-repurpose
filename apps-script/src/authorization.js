@@ -22,6 +22,7 @@ var ReclaimAuthorization = (function () {
     },
     COMPANY_OPERATOR: {
       REGISTRATION_READ: true,
+      REGISTRATION_CREATE: true,
       REGISTRATION_UPDATE: true,
       COMPANY_SETTINGS_READ: true
     }
