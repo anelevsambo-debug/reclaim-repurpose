@@ -72,7 +72,9 @@ var ReclaimIdentityBoundary = (function () {
       if (typeof currentTime !== 'number' || !isFinite(currentTime)) {
         return deny('IDENTITY_CLOCK_UNAVAILABLE');
       }
-      if (claims.issuedAt > currentTime + FUTURE_CLOCK_SKEW_MS ||
+      if (!isValidDateMillis(claims.issuedAt) || !isValidDateMillis(claims.expiresAt) ||
+          !isValidDateMillis(currentTime) ||
+          claims.issuedAt > currentTime + FUTURE_CLOCK_SKEW_MS ||
           claims.expiresAt <= currentTime ||
           claims.expiresAt <= claims.issuedAt ||
           claims.expiresAt - claims.issuedAt > MAX_ASSERTION_LIFETIME_MS) {
@@ -94,6 +96,11 @@ var ReclaimIdentityBoundary = (function () {
         }
       };
     }
+  }
+
+  function isValidDateMillis(value) {
+    var date = new Date(value);
+    return !isNaN(date.getTime());
   }
 
   function isNonEmptyText(value, maxLength) {
