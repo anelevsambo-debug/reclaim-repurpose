@@ -61,7 +61,7 @@ var ReclaimDataContract = (function () {
       return fail('REGISTRATION_ID_INVALID', 'Registration or company ID is invalid');
     }
     if (input.customer_name !== '' && input.customer_name !== null &&
-        input.customer_name !== undefined && !validText(input.customer_name, 200, true)) {
+        input.customer_name !== undefined && !validText(input.customer_name, 200, false)) {
       return fail('CUSTOMER_NAME_INVALID', 'Customer name is invalid');
     }
     if (!validText(input.contact_identifier, 255, false)) {
@@ -69,7 +69,7 @@ var ReclaimDataContract = (function () {
     }
     if (!oneOf(input.country_code, ['BW', 'SZ'])) return fail('COUNTRY_UNSUPPORTED', 'Country is unsupported');
     if (input.service_address !== '' && input.service_address !== null &&
-        input.service_address !== undefined && !validText(input.service_address, 500, true)) {
+        input.service_address !== undefined && !validText(input.service_address, 500, false)) {
       return fail('SERVICE_ADDRESS_INVALID', 'Service address is invalid');
     }
     if (!oneOf(input.status, REGISTRATION_STATUSES)) return fail('REGISTRATION_STATUS_INVALID', 'Registration status is invalid');
