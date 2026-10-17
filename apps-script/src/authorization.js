@@ -55,6 +55,10 @@ var ReclaimAuthorization = (function () {
       return deny('COMPANY_MEMBERSHIP_REQUIRED', 'Company membership is required');
     }
 
+    if (membership.provider !== principal.provider) {
+      return deny('COMPANY_MEMBERSHIP_PROVIDER_MISMATCH', 'Membership provider does not match this identity');
+    }
+
     if (membership.status !== 'ACTIVE') {
       return deny('COMPANY_MEMBERSHIP_INACTIVE', 'Company membership is not active');
     }
