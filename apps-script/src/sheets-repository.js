@@ -440,7 +440,7 @@ var ReclaimSheetsRepository = (function () {
   function safeCell(value) {
     var text = value === null || value === undefined ? '' : String(value);
     // A leading apostrophe forces potentially executable spreadsheet text to remain text.
-    if (/^\s*[=+\-@]/.test(text)) return "'" + text;
+    if (/^\s*=/.test(text)) return "'" + text;
     return text;
   }
 
