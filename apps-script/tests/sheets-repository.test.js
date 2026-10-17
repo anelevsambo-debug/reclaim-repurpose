@@ -308,4 +308,34 @@ describe('ReclaimSheetsRepository — fail-closed configuration and read isolati
     });
     assert.equal(JSON.stringify(result).includes('synthetic private spreadsheet failure'), false);
   });
+
+  it('fails closed when a persisted idempotency reservation is malformed', () => {
+    const h = harness();
+    h.workbook.sheets.Registrations.failNextWrite = true;
+    assert.equal(h.repository.createRegistration(createRequest()).ok, false);
+    h.workbook.sheets.RequestDedupe.rows[1][5] = 'CORRUPT';
+    const retry = h.repository.createRegistration(createRequest());
+    assert.equal(retry.ok, false);
+    assert.equal(retry.error.code, 'DEDUPE_RECORD_INVALID');
+    assert.equal(rows(h.workbook, 'Registrations').length, 0);
+  });
+
+  it('does not reuse a registration ID found in another company during recovery', () => {
+    const h = harness();
+    h.workbook.sheets.Registrations.failNextWrite = true;
+    assert.equal(h.repository.createRegistration(createRequest()).ok, false);
+    const reservation = rows(h.workbook, 'RequestDedupe')[0];
+    const reservedRegistrationId = reservation[6];
+    h.workbook.sheets.Registrations.rows.push([
+      reservedRegistrationId, 'company-b', 'Other Customer', '+26779999999', 'BW', '',
+      'PENDING', 'GRANTED', CREATED, CREATED, CREATED
+    ]);
+    const retry = h.repository.createRegistration(createRequest());
+    assert.equal(retry.ok, false);
+    assert.equal(retry.error.code, 'PERSISTENCE_OPERATION_FAILED');
+    assert.equal(rows(h.workbook, 'Registrations').length, 1);
+    assert.equal(rows(h.workbook, 'Registrations')[0][0], reservedRegistrationId);
+    assert.equal(rows(h.workbook, 'Registrations')[0][1], 'company-b');
+  });
+
 });
