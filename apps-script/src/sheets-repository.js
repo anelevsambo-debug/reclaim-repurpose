@@ -137,17 +137,26 @@ var ReclaimSheetsRepository = (function () {
         if (duplicateRows.length === 1) {
           reservationRow = duplicateRows[0];
           reservation = reservationRow.record;
+          var existingReservationValidation = dependencies.contract.validateDedupeRecord(reservation);
+          if (!existingReservationValidation.ok) {
+            return failure('DEDUPE_RECORD_INVALID', 'Stored request state requires reconciliation');
+          }
           if (reservation.request_fingerprint !== fingerprint) {
             return failure('IDEMPOTENCY_CONFLICT', 'Request key was already used with different input');
           }
           replayed = true;
           if (reservation.state === 'COMPLETED') {
             var completed = findRegistration(registrationRows, reservation.registration_id, authorizedCompanyId);
-            if (!completed) return failure('PERSISTENCE_INTEGRITY_ERROR', 'Stored request state requires reconciliation');
+            if (!completed || !dependencies.contract.validateRegistration(completed).ok) {
+              return failure('PERSISTENCE_INTEGRITY_ERROR', 'Stored request state requires reconciliation');
+            }
             return success(reservation.registration_id, completed.status, true);
           }
           var existingRegistration = findRegistration(registrationRows, reservation.registration_id, authorizedCompanyId);
           if (existingRegistration) {
+            if (!dependencies.contract.validateRegistration(existingRegistration).ok) {
+              return failure('PERSISTENCE_INTEGRITY_ERROR', 'Stored registration requires reconciliation');
+            }
             reservation.state = 'COMPLETED';
             reservation.updated_at = dependencies.now();
             reservationRow.record = reservation;
@@ -356,11 +365,16 @@ var ReclaimSheetsRepository = (function () {
     }
 
     function findRegistration(rows, registrationId, companyId) {
+      // Registration IDs are workbook-wide identifiers. Do not interpret an ID
+      // found in another tenant, or multiple matching rows, as a missing record.
       var matches = rows.filter(function (row) {
-        return row.record.registration_id === registrationId &&
-          row.record.company_id === companyId;
+        return row.record.registration_id === registrationId;
       });
-      if (matches.length !== 1) return null;
+      if (matches.length > 1) throw new Error('Registration ID is ambiguous');
+      if (matches.length === 0) return null;
+      if (matches[0].record.company_id !== companyId) {
+        throw new Error('Registration ID belongs to another company');
+      }
       return matches[0].record;
     }
 
