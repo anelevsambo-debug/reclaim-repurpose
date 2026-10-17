@@ -12,6 +12,7 @@ function request(overrides = {}) {
       subject: 'wa:15551234567'
     },
     membership: {
+      provider: 'WHATSAPP',
       subject: 'wa:15551234567',
       companyId: 'company-a',
       role: 'COMPANY_ADMIN',
@@ -38,6 +39,7 @@ describe('ReclaimAuthorization – allowed actions', () => {
   it('allows a company operator to read registrations within their company', () => {
     const result = ReclaimAuthorization.authorizeCompanyAction(request({
       membership: {
+        provider: 'WHATSAPP',
         subject: 'wa:15551234567',
         companyId: 'company-a',
         role: 'COMPANY_OPERATOR',
@@ -50,6 +52,7 @@ describe('ReclaimAuthorization – allowed actions', () => {
   it('allows a company operator to create registrations within their company', () => {
     const result = ReclaimAuthorization.authorizeCompanyAction(request({
       membership: {
+        provider: 'WHATSAPP',
         subject: 'wa:15551234567',
         companyId: 'company-a',
         role: 'COMPANY_OPERATOR',
@@ -68,6 +71,7 @@ describe('ReclaimAuthorization – allowed actions', () => {
         subject: 'google:user-123'
       },
       membership: {
+        provider: 'GOOGLE',
         subject: 'google:user-123',
         companyId: 'company-a',
         role: 'COMPANY_ADMIN',
@@ -77,6 +81,21 @@ describe('ReclaimAuthorization – allowed actions', () => {
     assert.equal(result.ok, true);
   });
 });
+
+  it('rejects a membership from a different identity provider', () => {
+    const result = ReclaimAuthorization.authorizeCompanyAction(request({
+      principal: { authenticated: true, provider: 'GOOGLE', subject: 'wa:15551234567' },
+      membership: {
+        provider: 'WHATSAPP',
+        subject: 'wa:15551234567',
+        companyId: 'company-a',
+        role: 'COMPANY_ADMIN',
+        status: 'ACTIVE'
+      }
+    }));
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, 'COMPANY_MEMBERSHIP_PROVIDER_MISMATCH');
+  });
 
 describe('ReclaimAuthorization – fail-closed identity and tenant boundaries', () => {
   it('rejects missing authorization input', () => {
@@ -118,6 +137,7 @@ describe('ReclaimAuthorization – fail-closed identity and tenant boundaries', 
   it('rejects inactive membership', () => {
     const result = ReclaimAuthorization.authorizeCompanyAction(request({
       membership: {
+        provider: 'WHATSAPP',
         subject: 'wa:15551234567',
         companyId: 'company-a',
         role: 'COMPANY_ADMIN',
@@ -131,6 +151,7 @@ describe('ReclaimAuthorization – fail-closed identity and tenant boundaries', 
   it('rejects a membership belonging to another identity', () => {
     const result = ReclaimAuthorization.authorizeCompanyAction(request({
       membership: {
+        provider: 'WHATSAPP',
         subject: 'wa:19999999999',
         companyId: 'company-a',
         role: 'COMPANY_ADMIN',
@@ -152,6 +173,7 @@ describe('ReclaimAuthorization – fail-closed identity and tenant boundaries', 
   it('rejects unsupported roles', () => {
     const result = ReclaimAuthorization.authorizeCompanyAction(request({
       membership: {
+        provider: 'WHATSAPP',
         subject: 'wa:15551234567',
         companyId: 'company-a',
         role: 'PLATFORM_ADMIN',
@@ -165,6 +187,7 @@ describe('ReclaimAuthorization – fail-closed identity and tenant boundaries', 
   it('rejects actions not granted to a company operator', () => {
     const result = ReclaimAuthorization.authorizeCompanyAction(request({
       membership: {
+        provider: 'WHATSAPP',
         subject: 'wa:15551234567',
         companyId: 'company-a',
         role: 'COMPANY_OPERATOR',
