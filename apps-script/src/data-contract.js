@@ -92,11 +92,8 @@ var ReclaimDataContract = (function () {
       return fail('DEDUPE_DIGEST_INVALID', 'Deduplication digests must be lowercase SHA-256 hex');
     }
     if (!oneOf(input.state, DEDUPE_STATES)) return fail('DEDUPE_STATE_INVALID', 'Deduplication state is invalid');
-    if (input.state === 'PROCESSING' && input.registration_id) {
-      return fail('DEDUPE_STATE_INCONSISTENT', 'Processing record cannot reference a completed registration');
-    }
-    if (input.state === 'COMPLETED' && !validId(input.registration_id)) {
-      return fail('DEDUPE_REGISTRATION_REQUIRED', 'Completed record requires a registration ID');
+    if (!validId(input.registration_id)) {
+      return fail('DEDUPE_REGISTRATION_REQUIRED', 'Every reservation requires its preallocated registration ID');
     }
     var time = validateTimestamps(input);
     if (!time.ok) return time;
