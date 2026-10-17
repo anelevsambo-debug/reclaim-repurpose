@@ -25,7 +25,9 @@ var ReclaimValidation = (function () {
     if (!country) {
       return fail('COUNTRY_UNSUPPORTED', 'Country must be BOTSWANA or ESWATINI');
     }
-    return ok(country);
+    // Never expose the internal policy object: callers must not be able to mutate
+    // country/currency rules by modifying a returned validation result.
+    return ok({ code: country.code, currency: country.currency, name: country.name });
   }
 
   function validateCurrency(currency, expectedCurrency) {
@@ -124,10 +126,6 @@ var ReclaimValidation = (function () {
     validateCurrency: validateCurrency,
     validateMoney: validateMoney,
     validateOrganisation: validateOrganisation,
-    _test: {
-      SUPPORTED_COUNTRIES: SUPPORTED_COUNTRIES,
-      ORGANISATION_STATUSES: ORGANISATION_STATUSES
-    }
   };
 })();
 
