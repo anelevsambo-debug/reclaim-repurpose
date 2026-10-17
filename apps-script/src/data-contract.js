@@ -38,7 +38,9 @@ var ReclaimDataContract = (function () {
     if (!oneOf(input.status, COMPANY_STATUSES)) return fail('COMPANY_STATUS_INVALID', 'Company status is invalid');
     var time = validateTimestamps(input);
     if (!time.ok) return time;
-    return ok(copyFields(input, SHEETS.Companies));
+    var normalized = copyFields(input, SHEETS.Companies);
+    normalized.display_name = input.display_name.trim();
+    return ok(normalized);
   }
 
   function validateMembership(input) {
@@ -64,8 +66,10 @@ var ReclaimDataContract = (function () {
         input.customer_name !== undefined && !validText(input.customer_name, 200, false)) {
       return fail('CUSTOMER_NAME_INVALID', 'Customer name is invalid');
     }
-    if (!validText(input.contact_identifier, 255, false)) {
-      return fail('CONTACT_IDENTIFIER_INVALID', 'Contact identifier is invalid');
+    // Customer phone contacts are stored in canonical E.164 form, normalized by
+    // the trusted channel/service before reaching this data contract.
+    if (typeof input.contact_identifier !== 'string' || !/^\\+[1-9]\\d{7,14}$/.test(input.contact_identifier)) {
+      return fail('CONTACT_IDENTIFIER_INVALID', 'Contact identifier must use canonical E.164 format');
     }
     if (!oneOf(input.country_code, ['BW', 'SZ'])) return fail('COUNTRY_UNSUPPORTED', 'Country is unsupported');
     if (input.service_address !== '' && input.service_address !== null &&
@@ -81,7 +85,10 @@ var ReclaimDataContract = (function () {
     }
     var time = validateTimestamps(input);
     if (!time.ok) return time;
-    return ok(copyFields(input, SHEETS.Registrations));
+    var normalized = copyFields(input, SHEETS.Registrations);
+    normalized.customer_name = typeof input.customer_name === 'string' ? input.customer_name.trim() : '';
+    normalized.service_address = typeof input.service_address === 'string' ? input.service_address.trim() : '';
+    return ok(normalized);
   }
 
   function validateDedupeRecord(input) {
