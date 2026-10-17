@@ -2,7 +2,7 @@
   "name": "reclaim-repurpose",
   "version": "0.1.0",
   "private": true,
-  "description": "RECLAIM & REPURPOSE – Stage 1 pure validation foundation",
+  "description": "RECLAIM & REPURPOSE — waste collection registration foundation",
   "scripts": {
     "test": "node --test apps-script/tests",
     "test:validation": "node --test apps-script/tests/validation.test.js"
