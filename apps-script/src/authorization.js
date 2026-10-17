@@ -12,6 +12,7 @@ var ReclaimAuthorization = (function () {
   var COMPANY_ROLES = {
     COMPANY_ADMIN: {
       REGISTRATION_READ: true,
+      REGISTRATION_CREATE: true,
       REGISTRATION_UPDATE: true,
       REGISTRATION_EXPORT: true,
       COMPANY_SETTINGS_READ: true,
