@@ -89,6 +89,7 @@ var ReclaimSheetsRepository = (function () {
         if (!memberResult.ok) return failure('MEMBERSHIP_INVALID', 'Company membership could not be verified');
 
         var membership = {
+          provider: memberResult.value.identity_provider,
           subject: memberResult.value.provider_subject,
           companyId: memberResult.value.company_id,
           role: memberResult.value.role,
@@ -261,6 +262,7 @@ var ReclaimSheetsRepository = (function () {
         var auth = dependencies.authorization.authorizeCompanyAction({
           principal: principal,
           membership: {
+            provider: member.value.identity_provider,
             subject: member.value.provider_subject,
             companyId: member.value.company_id,
             role: member.value.role,
