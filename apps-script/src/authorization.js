@@ -12,6 +12,7 @@ var ReclaimAuthorization = (function () {
   var COMPANY_ROLES = {
     COMPANY_ADMIN: {
       REGISTRATION_READ: true,
+      REGISTRATION_CREATE: true,
       REGISTRATION_UPDATE: true,
       REGISTRATION_EXPORT: true,
       COMPANY_SETTINGS_READ: true,
@@ -21,6 +22,7 @@ var ReclaimAuthorization = (function () {
     },
     COMPANY_OPERATOR: {
       REGISTRATION_READ: true,
+      REGISTRATION_CREATE: true,
       REGISTRATION_UPDATE: true,
       COMPANY_SETTINGS_READ: true
     }
@@ -51,6 +53,10 @@ var ReclaimAuthorization = (function () {
     var membership = input.membership;
     if (!membership || typeof membership !== 'object') {
       return deny('COMPANY_MEMBERSHIP_REQUIRED', 'Company membership is required');
+    }
+
+    if (membership.provider !== principal.provider) {
+      return deny('COMPANY_MEMBERSHIP_PROVIDER_MISMATCH', 'Membership provider does not match this identity');
     }
 
     if (membership.status !== 'ACTIVE') {
