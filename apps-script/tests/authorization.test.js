@@ -82,6 +82,7 @@ describe('ReclaimAuthorization – allowed actions', () => {
   });
 });
 
+describe('ReclaimAuthorization – fail-closed identity and tenant boundaries', () => {
   it('rejects a membership from a different identity provider', () => {
     const result = ReclaimAuthorization.authorizeCompanyAction(request({
       principal: { authenticated: true, provider: 'GOOGLE', subject: 'wa:15551234567' },
@@ -97,7 +98,7 @@ describe('ReclaimAuthorization – allowed actions', () => {
     assert.equal(result.error.code, 'COMPANY_MEMBERSHIP_PROVIDER_MISMATCH');
   });
 
-describe('ReclaimAuthorization – fail-closed identity and tenant boundaries', () => {
+
   it('rejects missing authorization input', () => {
     const result = ReclaimAuthorization.authorizeCompanyAction(null);
     assert.equal(result.ok, false);
