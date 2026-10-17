@@ -55,25 +55,27 @@ All financial figures, assumptions, and reports must remain country-scoped.
 
 ## Current status
 
-**Stage 1 complete; Stage 2 real identity integration remains incomplete; Stage 3 implementation is under review** (17 October 2026)
+**Stage 1 complete; Stage 3 foundation merged; Stage 2 identity and membership integration remains in progress** (17 October 2026).
 
-Implemented and CI-verified:
+Implemented in the current baseline:
 
-- Clean project skeleton and Apps Script V8 manifest
-- Pure validation module and Node test suite
-- Country policy returned as detached data; internal country rules are not exported for mutation
-- Pure company authorization policy with active-membership, identity-match, role, action, and tenant-scope checks
-- Negative tests for unauthenticated identities, unsupported roles/actions, inactive membership, and cross-company access
-- Apps Script manifest least-privilege check; unused explicit OAuth scopes removed until integrations require them
-- GitHub Actions validation workflow
-- Stage 3 pull request #5 adds a versioned schema contract and dependency-injected Google Sheets repository, with synthetic tests for company scoping, locking, and retry recovery
+- Clean project skeleton, Apps Script V8 manifest, and pure validation suite
+- Company authorization policy with identity-match, active-membership, role, action, and tenant-scope checks
+- Versioned Google Sheets data contract and dependency-injected repository
+- Synthetic tests for tenant scoping, locking, idempotency/recovery, malformed stored state, and validation
+- GitHub Actions validation workflow; [run #24 passed on the merged baseline](https://github.com/anelevsambo-debug/reclaim-repurpose/actions/runs/39064376066)
 
-**Not implemented or proven:** verified WhatsApp webhook identity, Google identity integration, a configured live workbook, real Apps Script/Google Sheets integration tests, AppSheet dashboards, live deployment, or operational pilot capability. Stage 3 is not complete until pull request #5 is reviewed, CI is verified, and the remaining trust-boundary limitations are documented and accepted.
+Stage 2 work in progress on the feature branch adds a provider-independent verified-identity boundary contract and a consent-provenance policy, with deterministic negative tests. These are **contracts and mocked tests**, not live provider integrations.
 
-The authorization helper is not an authentication system. It must only receive a principal from a future verified identity adapter and membership loaded from the server-side store. Do not accept these values directly from customer-controlled request fields.
+**Not implemented or proven:** Meta/WhatsApp cryptographic webhook verification, Google identity verification, authoritative membership provisioning controls, real consent capture and durable consent-event audit, a configured live workbook, real Apps Script/Sheets integration tests, AppSheet dashboards, live deployment, or operational pilot capability.
 
-**Current engineering focus:** review Stage 3 pull request #5, verify automated tests, and keep all live integration gates blocked. Stage 2 verified identity integration and authoritative membership provenance must be implemented before any public registration entry point can be enabled.
+The authorization helper is not an authentication system. It must only receive a principal produced by a trusted identity adapter and membership loaded from a controlled server-side source. Do not accept these values directly from customer-controlled request fields.
 
+A material architecture blocker remains: the documented Apps Script web-app event object exposes request parameters and POST body fields, but not HTTP request headers. Meta WhatsApp webhook authenticity normally depends on validating `X-Hub-Signature-256` against the original body. A direct Apps Script handler therefore cannot claim to verify the Meta signature using the documented event object. Do not create or enable a public handler until a compatible trusted ingress is approved.
+
+The current repository method also expects the authenticated actor to be a company member, while customer-originated WhatsApp registration requires a separate customer identity/consent path and trusted company-routing rule. Do not conflate customer consent with company membership.
+
+**Release rule:** Keep all public registration entry points closed until identity verification, membership provenance, consent capture, and real Apps Script/Sheets integration have separate tests and evidence. See [Stage 2 identity and membership gates](docs/digital/STAGE_2_IDENTITY_MEMBERSHIP.md).
 ---
 
 *Build the smallest verifiable pilot. Prefer evidence over speculation.*
