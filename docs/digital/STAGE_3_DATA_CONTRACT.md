@@ -100,12 +100,12 @@ Exact headers:
 - `idempotency_key_hash`: SHA-256 digest of a bounded, non-empty source event key, namespaced by company and source before hashing. Do not store raw provider event payloads.
 - `request_fingerprint`: SHA-256 digest of the canonical validated registration input. It detects reuse of the same idempotency key with different input.
 - `state`: `PROCESSING` or `COMPLETED`.
-- `registration_id`: empty while processing; stable registration ID when completed.
+- `registration_id`: preallocated stable registration ID in both states. Reserving the ID before the registration write makes interrupted writes reconcilable.
 - `created_at`, `updated_at`: UTC timestamps.
 
-Logical uniqueness is `company_id + source + idempotency_key_hash`. Under the script lock, reserve a `PROCESSING` row before creating a registration. A retry with the same key and fingerprint returns the existing registration only if the dedupe row is `COMPLETED`; a different fingerprint is a conflict; a still-`PROCESSING` row returns a safe retryable/in-progress result and must not create another registration. Complete the dedupe row only after the registration write succeeds.
+Logical uniqueness is `company_id + source + idempotency_key_hash`. Under the script lock, reserve a `PROCESSING` row with a preallocated registration ID before creating the registration. A retry with the same key and fingerprint must inspect that reserved ID: if the registration exists and belongs to the same company, complete the dedupe row; if it does not exist, retry the write using the same reserved ID. A different fingerprint is a conflict. Never generate a second registration ID for the same reservation. Complete the dedupe row only after the registration write succeeds.
 
-Because Google Sheets has no transaction, a crash after writing a registration but before marking the dedupe row `COMPLETED` can leave a stuck `PROCESSING` row. Never automatically create a second registration in this case. A restricted reconciliation process must inspect and repair it using the same lock and audit evidence. This is duplicate resistance, not a claim of exactly-once delivery.
+Because Google Sheets has no transaction, a crash can leave a `PROCESSING` reservation. The reserved ID permits reconciliation without guessing. All recovery must use the same lock and re-check both rows. This is duplicate resistance, not a claim of exactly-once delivery.
 
 ## 4. Trust boundary and data flow
 
