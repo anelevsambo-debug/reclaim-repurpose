@@ -68,7 +68,7 @@ var ReclaimDataContract = (function () {
     }
     // Customer phone contacts are stored in canonical E.164 form, normalized by
     // the trusted channel/service before reaching this data contract.
-    if (typeof input.contact_identifier !== 'string' || !/^\\+[1-9]\\d{7,14}$/.test(input.contact_identifier)) {
+    if (typeof input.contact_identifier !== 'string' || !/^\+[1-9]\d{7,14}$/.test(input.contact_identifier)) {
       return fail('CONTACT_IDENTIFIER_INVALID', 'Contact identifier must use canonical E.164 format');
     }
     if (!oneOf(input.country_code, ['BW', 'SZ'])) return fail('COUNTRY_UNSUPPORTED', 'Country is unsupported');
