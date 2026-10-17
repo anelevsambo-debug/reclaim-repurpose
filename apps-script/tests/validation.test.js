@@ -128,3 +128,23 @@ describe('ReclaimValidation – Organisation', () => {
     assert.equal(r.error.code, 'ORGANISATION_STATUS_UNSUPPORTED');
   });
 });
+
+
+describe('ReclaimValidation – Policy immutability', () => {
+  it('does not allow callers to mutate supported country policy through a result', () => {
+    const country = ReclaimValidation.validateCountry('BOTSWANA');
+    assert.equal(country.ok, true);
+
+    country.value.currency = 'SZL';
+    country.value.code = 'SZ';
+
+    const subsequent = ReclaimValidation.validateCountry('BOTSWANA');
+    assert.equal(subsequent.ok, true);
+    assert.equal(subsequent.value.currency, 'BWP');
+    assert.equal(subsequent.value.code, 'BW');
+  });
+
+  it('does not expose mutable internal policy constants', () => {
+    assert.equal(Object.prototype.hasOwnProperty.call(ReclaimValidation, '_test'), false);
+  });
+});
