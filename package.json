@@ -4,8 +4,8 @@
   "private": true,
   "description": "RECLAIM & REPURPOSE – Stage 1 pure validation foundation",
   "scripts": {
-    "test": "node --test apps-script/tests/validation.test.js",
-    "test:validation": "node --test apps-script/tests/validation.test.js"
+    "test": "node --test apps-script/tests",
+    "test:validation": "node --test apps-script/tests"
   },
   "engines": {
     "node": ">=18"
