@@ -71,7 +71,7 @@ Exact headers:
 - `registration_id`: required stable server-generated ID; unique.
 - `company_id`: required existing company ID and tenant scope.
 - `customer_name`: optional, trimmed, maximum 200 characters; collect only if operationally necessary.
-- `contact_identifier`: required only for a contact channel that needs a reply, normalized before storage; treat as personal data and never expose it in logs. Do not collect it until consent and a valid channel flow exist.
+- `contact_identifier`: required only for a contact channel that needs a reply; store phone numbers in canonical E.164 form (for example, `+267...` or `+268...`) after trusted channel normalization. Treat it as personal data and never expose it in logs. Do not collect it until consent and a valid channel flow exist.
 - `country_code`: `BW` or `SZ`; must agree with the selected company's country unless an explicit reviewed cross-border policy is introduced.
 - `service_address`: optional, maximum 500 characters; collect only when needed to provide the service. Avoid precise location data unless required.
 - `status`: `PENDING`, `ACTIVE`, `PAUSED`, or `CANCELLED`.
