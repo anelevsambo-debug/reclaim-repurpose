@@ -138,3 +138,11 @@ describe('ReclaimIdentityBoundary — trusted verifier contract', () => {
     assert.equal(result.error.code, 'IDENTITY_VERIFICATION_FAILED');
   });
 });
+  it('rejects timestamps outside the JavaScript date range without throwing', () => {
+    const result = boundary({
+      whatsappVerifier: () => claims({ issuedAt: 1e100, expiresAt: 1e101 })
+    }).verifyWhatsApp({});
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, 'IDENTITY_ASSERTION_EXPIRED_OR_INVALID');
+  });
+
