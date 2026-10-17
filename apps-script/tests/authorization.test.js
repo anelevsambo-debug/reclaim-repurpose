@@ -47,6 +47,19 @@ describe('ReclaimAuthorization – allowed actions', () => {
     assert.equal(result.ok, true);
   });
 
+  it('allows a company operator to create registrations within their company', () => {
+    const result = ReclaimAuthorization.authorizeCompanyAction(request({
+      membership: {
+        subject: 'wa:15551234567',
+        companyId: 'company-a',
+        role: 'COMPANY_OPERATOR',
+        status: 'ACTIVE'
+      },
+      action: 'REGISTRATION_CREATE'
+    }));
+    assert.equal(result.ok, true);
+  });
+
   it('allows Google identity only when the trusted adapter marks it authenticated', () => {
     const result = ReclaimAuthorization.authorizeCompanyAction(request({
       principal: {
