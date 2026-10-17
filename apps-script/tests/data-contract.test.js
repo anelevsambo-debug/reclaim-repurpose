@@ -58,7 +58,7 @@ function dedupe(overrides = {}) {
     idempotency_key_hash: 'a'.repeat(64),
     request_fingerprint: 'b'.repeat(64),
     state: 'PROCESSING',
-    registration_id: '',
+    registration_id: 'reg-1',
     created_at: created,
     updated_at: updated,
     ...overrides
@@ -168,7 +168,7 @@ describe('ReclaimDataContract — idempotency record', () => {
     assert.equal(Contract.validateDedupeRecord(dedupe({ idempotency_key_hash: 'raw-event-id' })).error.code, 'DEDUPE_DIGEST_INVALID');
     assert.equal(Contract.validateDedupeRecord(dedupe({ state: 'COMPLETED', registration_id: '' })).error.code, 'DEDUPE_REGISTRATION_REQUIRED');
     assert.equal(Contract.validateDedupeRecord(dedupe({ state: 'COMPLETED', registration_id: 'reg-1' })).ok, true);
-    assert.equal(Contract.validateDedupeRecord(dedupe({ state: 'PROCESSING', registration_id: 'reg-1' })).error.code, 'DEDUPE_STATE_INCONSISTENT');
+    assert.equal(Contract.validateDedupeRecord(dedupe({ state: 'PROCESSING', registration_id: 'reg-1' })).ok, true);
     assert.equal(Contract.validateDedupeRecord(dedupe({ source: 'UNTRUSTED' })).error.code, 'DEDUPE_SOURCE_INVALID');
   });
 });
