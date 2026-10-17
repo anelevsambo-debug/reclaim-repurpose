@@ -55,7 +55,7 @@ All financial figures, assumptions, and reports must remain country-scoped.
 
 ## Current status
 
-**Stage 1 complete; Stage 2 security foundation in progress** (17 October 2026)
+**Stage 1 complete; Stage 2 real identity integration remains incomplete; Stage 3 implementation is under review** (17 October 2026)
 
 Implemented and CI-verified:
 
@@ -66,12 +66,13 @@ Implemented and CI-verified:
 - Negative tests for unauthenticated identities, unsupported roles/actions, inactive membership, and cross-company access
 - Apps Script manifest least-privilege check; unused explicit OAuth scopes removed until integrations require them
 - GitHub Actions validation workflow
+- Stage 3 pull request #5 adds a versioned schema contract and dependency-injected Google Sheets repository, with synthetic tests for company scoping, locking, and retry recovery
 
-**Not implemented or proven:** verified WhatsApp webhook identity, Google identity, authoritative membership lookup, Google Sheets persistence, registration creation, idempotency, AppSheet dashboards, live deployment, or operational pilot capability.
+**Not implemented or proven:** verified WhatsApp webhook identity, Google identity integration, a configured live workbook, real Apps Script/Google Sheets integration tests, AppSheet dashboards, live deployment, or operational pilot capability. Stage 3 is not complete until pull request #5 is reviewed, CI is verified, and the remaining trust-boundary limitations are documented and accepted.
 
 The authorization helper is not an authentication system. It must only receive a principal from a future verified identity adapter and membership loaded from the server-side store. Do not accept these values directly from customer-controlled request fields.
 
-**Next engineering stage:** define and test the Google Sheets data contract and server-side repository boundary, then implement verified identity and restricted registration entry points. Keep all live integration gates blocked until tested against the actual configured services.
+**Current engineering focus:** review Stage 3 pull request #5, verify automated tests, and keep all live integration gates blocked. Stage 2 verified identity integration and authoritative membership provenance must be implemented before any public registration entry point can be enabled.
 
 ---
 
