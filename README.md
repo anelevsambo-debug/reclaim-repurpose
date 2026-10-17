@@ -55,14 +55,23 @@ All financial figures, assumptions, and reports must remain country-scoped.
 
 ## Current status
 
-**Stage 1 complete** — Pure validation foundation (16 October 2026)
+**Stage 1 complete; Stage 2 security foundation in progress** (17 October 2026)
 
-- Clean project skeleton
-- Apps Script manifest
-- Pure validation module + Node tests
-- GitHub Actions CI
+Implemented and CI-verified:
 
-No live Google, WhatsApp, or operational capability is claimed.
+- Clean project skeleton and Apps Script V8 manifest
+- Pure validation module and Node test suite
+- Country policy returned as detached data; internal country rules are not exported for mutation
+- Pure company authorization policy with active-membership, identity-match, role, action, and tenant-scope checks
+- Negative tests for unauthenticated identities, unsupported roles/actions, inactive membership, and cross-company access
+- Apps Script manifest least-privilege check; unused explicit OAuth scopes removed until integrations require them
+- GitHub Actions validation workflow
+
+**Not implemented or proven:** verified WhatsApp webhook identity, Google identity, authoritative membership lookup, Google Sheets persistence, registration creation, idempotency, AppSheet dashboards, live deployment, or operational pilot capability.
+
+The authorization helper is not an authentication system. It must only receive a principal from a future verified identity adapter and membership loaded from the server-side store. Do not accept these values directly from customer-controlled request fields.
+
+**Next engineering stage:** define and test the Google Sheets data contract and server-side repository boundary, then implement verified identity and restricted registration entry points. Keep all live integration gates blocked until tested against the actual configured services.
 
 ---
 
