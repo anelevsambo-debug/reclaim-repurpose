@@ -117,6 +117,7 @@ describe('ReclaimDataContract — company and membership records', () => {
     assert.equal(Contract.validateCompany(company({ country_code: 'ZA' })).error.code, 'COUNTRY_UNSUPPORTED');
     assert.equal(Contract.validateCompany(company({ status: 'DELETED' })).error.code, 'COMPANY_STATUS_INVALID');
     assert.equal(Contract.validateCompany(company({ display_name: '  ' })).error.code, 'COMPANY_NAME_INVALID');
+    assert.equal(Contract.validateCompany(company({ display_name: '  Recovery Co  ' })).value.display_name, 'Recovery Co');
     assert.equal(Contract.validateCompany(company({ created_at: 'yesterday' })).error.code, 'TIMESTAMP_INVALID');
     assert.equal(Contract.validateCompany(company({ updated_at: created, created_at: updated })).error.code, 'TIMESTAMP_ORDER_INVALID');
   });
@@ -139,6 +140,9 @@ describe('ReclaimDataContract — registrations and consent', () => {
 
   it('rejects missing contact identifier, bad country, and oversized address', () => {
     assert.equal(Contract.validateRegistration(registration({ contact_identifier: '' })).error.code, 'CONTACT_IDENTIFIER_INVALID');
+    assert.equal(Contract.validateRegistration(registration({ contact_identifier: '26771111111' })).error.code, 'CONTACT_IDENTIFIER_INVALID');
+    assert.equal(Contract.validateRegistration(registration({ customer_name: '  Synthetic Customer  ', service_address: '  Plot 12  ' })).value.customer_name, 'Synthetic Customer');
+    assert.equal(Contract.validateRegistration(registration({ customer_name: 'Synthetic Customer', service_address: '  Plot 12  ' })).value.service_address, 'Plot 12');
     assert.equal(Contract.validateRegistration(registration({ country_code: 'SZL' })).error.code, 'COUNTRY_UNSUPPORTED');
     assert.equal(Contract.validateRegistration(registration({ service_address: 'x'.repeat(501) })).error.code, 'SERVICE_ADDRESS_INVALID');
   });
